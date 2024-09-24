@@ -1,0 +1,357 @@
+
+
+ Go to: https://www.robinwieruch.de/minimal-react-webpack-babel-setup/#hot-module-replacement-in-react
+
+
+  ============================================
+    Manually Setup Webpack and Babel To Use RTL
+  ============================================
+ 
+ - This tutorial supports the latest versions of React, Webpack 5, and Babel 7.
+
+1. Scroll down to REACT With Babel:
+     npm install --save-dev @babel/preset-react
+     add in babel.rc: 
+        "@babel/preset-react"
+     Add to webpack.config:
+        Add to rules section:
+           test: /\.(js|jsx)$/,     
+        add to resolve section:
+          extensions: ['*', '.js', '.jsx'],
+     That's it:
+
+2. Scroll down to "React with web pack"
+     npm install --save react react-dom
+
+    In your src/index.js, you can implement your entry point into the React world:
+          import React from 'react';
+          import ReactDOM from 'react-dom';
+
+          const title = 'React with Webpack and Babel';
+
+          ReactDOM.render(
+            <div>{title}</div>,
+            document.getElementById('app')
+          );
+
+        The React DOM API takes two arguments. Whereas the first argument is 
+     the rendered JSX from React, the second argument is the HTML element 
+     where it should be integrated into the DOM. Since it expects an HTML 
+     element identified by an id attribute, we need to add this element in 
+     our dist/index.html file:
+
+         <div id="app"></div>
+     
+     Start your application: npm start
+
+3. Scroll to Hot Module Replacement in React:  
+     npm install --save-dev react-hot-loader
+        
+     Second, add the configuration to your webpack.config.js file:
+       const webpack = require('webpack');
+       plugins: [new webpack.HotModuleReplacementPlugin()],
+       add in devServer Section:
+          hot: true,
+
+        Third in the src/index.js file, you have to define that hot 
+     reloading is available and should be used. Add:
+         module.hot.accept();
+     
+        Last but not least, create your first React component. 
+     In your src/index.js file, import a not yet defined App component:
+
+     Then create App.js in .\src and the following content:
+           import React from 'react';
+
+          const App = ({ title }) =>
+            <div>{title}</div>;
+
+          export default App;
+
+    Congratulations, you have created your first function component and passed props to it. 
+    That's it for a minimal React setup with Babel and Webpack.
+    
+================================================
+3. Go to:
+    https://www.robinwieruch.de/webpack-advanced-setup-tutorial/
+
+    Part 1: How to set up Webpack 5
+    Part 2: How to set up Webpack 5 with Babel
+
+       The above (Part 1 and 2) have shown you how to set up a basic web application 
+    with Webpack 5. So far, Webpack is only used to bundle all your JavaScript files, 
+    to transpile new JavaScript features via Babel, and to serve your bundle in 
+    development mode via Webpack's Development Server. Basically that's everything 
+    that's needed to get started with creating your first web application.
+
+    After this tutorial the final advanced Webpack setup can be found in github:
+      https://github.com/rwieruch/webpack-advanced-setup
+
+    Step1: Scroll to Webpack's Development and Production Build
+       -  if you type npm start, Webpack will create this bundle.js file on the fly 
+       which is used for the Webpack Dev Server to start your application in development 
+       mode. You never really see the bundle.js file yourself.
+
+       - Now let's introduce a second npm script to actually build your application 
+       for production. Add to package.json
+           "build": "webpack --config ./webpack.config.js --mode production",
+
+       - run npm build 
+
+       - after the build runs you can actually see dist/bundle.js created
+
+       - the only thing left to do is to upload your dist/ folder to a web 
+       server now. However, in order to check locally whether the dist/ folder 
+       has everything you need to run your application on a remote web server, 
+       use a local web server to try it out yourself:
+
+            npx http-server dist
+
+         it should output an URL which you can visit in a browser. If everything works 
+       as expected, you can upload the dist/ folder with its content to your web server. 
+       Personally I prefer to use DIGITALOCEAN to host my static websites and web 
+       applications.
+
+         Starting up http-server, serving dist
+
+         http-server version: 14.1.1
+
+         http-server settings: 
+         CORS: disabled
+         Cache: 3600 seconds
+         Connection Timeout: 120 seconds
+         Directory Listings: visible
+         AutoIndex: visible
+         Serve GZIP Files: false
+         Serve Brotli Files: false
+         Default File Extension: none
+
+         Available on:
+         http://192.168.1.244:8080
+         http://127.0.0.1:8080
+         Hit CTRL-C to stop the server
+         
+    Step2: Scroll to How to manage your Webpack Build Folder
+        -  Every time you run npm run build, you will see Webpack creating a new 
+      version of your bundle JavaScript source code with a dist/bundle.js file.
+      The best thing would be to start with an empty dist/ folder with every 
+      Webpack build.
+
+      - In order to auto generate the dist/index.html file as well and bundle.js, we can use 
+      a Webpack plugin. First, install the html-webpack-plugin plugin as dev dependency 
+      from your project's root directory:
+
+          npm install --save-dev html-webpack-plugin
+
+         and copy to webpack/config. 
+         const HtmlWebpackPlugin = require('html-webpack-plugin'); 
+         plugins: [new HtmlWebpackPlugin()],
+      
+         Now, run npm run build again and see how it auto generates a new 
+         dist/index.html file
+
+         if you want to have custom content for your dist/index.html file, you can specify a 
+         template yourself. Add the code below to the plugins section of webpack.config:
+                new HtmlWebpackPlugin({
+                  title: 'Hello Webpack bundled JavaScript Project',
+                  template: path.resolve(__dirname, './src/index.html'),
+               })
+      - Then, create a new src/index.html template file in your source code folder and give it the 
+      following content:
+
+             touch index.html  (See detailed explanation written inside this file)
+
+      - run npm run build again
+
+      - Finally we have been able to create both files, dist/bundle.js and dist/index.html 
+      automatically with Webpack. This means we can delete the content of our dist/ folder 
+      with every Webpack build. In order to do so, introduce the clean-webpack-plugin plugin:
+
+          npm install --save-dev clean-webpack-plugin
+
+          then introduce it in your webpack.config.js file:
+              new CleanWebpackPlugin(),
+
+      - Now, every Webpack build will wipe the content of your dist/ folder before 
+      creating the new dist/index.html and dist/bundle.js files from scratch. Having it 
+      set up this way, you will never find files from older Webpack builds in your dist/folder 
+      which is perfect for just taking your entire dist/ folder to production.
+      Note: 
+         If you are using a version control system like GitHub, you can put the build 
+      folder (dist/) into your .gitignore file, because everything is auto generated for 
+      everyone anyway.
+
+    Step3: Scroll to Webpack Source Maps
+        - Webpack bundles all of your JavaScript source code files. That's perfect, 
+        however, it introduces one pitfall for us as developers. Once you introduce a 
+        bug and see it in your browser's developer tools, it's often difficult to track 
+        down the file where the bug happened, because everything is bundled into one 
+        JavaScript file by Webpack.
+
+        - In order to overcome this problem, there are source maps which can be introduced 
+        to give Webpack a reference to the origin source code. By using the source maps, 
+        Webpack can map all the bundled source code back to the original source. In
+        webpack.config.js add:
+            devtool: 'source-map',
+
+        - Clicking on the file gives you the actual source code and location of the 
+        bug even though all your JavaScript source code got bundled by Webpack. Also note 
+        that there is a new file called dist/bundle.js.map which is used to perform the
+        mapping between actual source code from src/ and the bundled JavaScript in dist/bundle.js.
+            
+
+        - In order to overcome this problem, there are source maps which can be introduced 
+        to give Webpack a reference to the origin source code. By using the source maps, 
+        Webpack can map all the bundled source code back to the original source. 
+        In your webpack.config.js file, introduce one common configuration for source maps:
+
+        By doing this clicking on the file gives the actual source code and location 
+        of the bug. Also note that there is a new file called dist/bundle.js.map which is 
+        used to perform the mapping between actual source code from src/ and the 
+        bundled JavaScript in dist/bundle.js.
+
+        To Test: sum.js 
+            - npm start 
+                 f12 --> console--> will see the following error: 
+                 Uncaught ReferenceError: c is not defined
+                     at __WEBPACK_DEFAULT_EXPORT__ (sum.js:2:16)
+                     at ./src/index.js (index.js:19:16)
+                     at __webpack_require__ (bootstrap:24:1)
+            -  click sum.js   where the error happened, you only see Webpack's bundled output.   
+               In the case of this example, it's still readable, however imagine the output for a more complex problem:
+
+            - Run npm run build and npx http-server dist to see the error in your browser again:
+                 - npm run build
+                 - npx http-server dist ( to see the error in your browser again:)
+
+                 - this time the error is hidden in you bundle.js.
+
+            - Clicking on the file (sum.js) gives you the actual source code and location of 
+                  Uncaught ReferenceError: c is not defined
+                     at __WEBPACK_DEFAULT_EXPORT__ (sum.js:2:16)
+
+                  The  click will take you to the source code where the error occured.
+                 export default function (a, b) {
+                     return a + c;  //instead of returning  a+b;
+                  };
+
+            the bug even though all your JavaScript source code got bundled by Webpack. 
+            Also note that there is a new file called dist/bundle.js.map which is used 
+            to perform the mapping between actual source code from src/ and the bundled 
+            JavaScript in dist/bundle.js.
+
+    Step4: Scroll to Webpack Development/Build Configuration
+           So far, we have used one common Webpack configuration for development and production. 
+        However, we can introduce a configuration for each mode as well. In your package.json, 
+        change the start and build scripts to the following:
+
+          "start": "webpack serve --config ./webpack.dev.js",
+          "build": "webpack --config ./webpack.prod.js",
+
+         Create these two files - and copy the old webpack.config.js over to both of them
+            and delete the old webpack.config.js
+            
+            First webpack.dev.js change:
+                mode: 'development',
+            Second, the webpack.prod.js change:
+                mode: 'production',
+            
+            - Our npm scripts to start and build your application should work again. 
+              But you may wonder: What's the difference now. 
+              
+            - next add "devtool: 'eval-source-map', 
+              to webpack.dev but not in webpack.prod.js but not in webpack.prod.js 
+              because it is faster to create source map in DEV
+
+
+    Step5: Scroll to Webpack Merge Configuration
+
+    Step6: Webpack Environment Variables: Definition
+
+    Step7: Webpack Environment Variables: ENV
+
+    Step8: Webpack Addons 
+
+================================================
+4. SETUP REACT TESTING LIBRARY
+  
+       After the setting up in Jest or Vitest, you will learn how to render a 
+   React component in a test with React Testing Library. We will use 
+   the following function component called App component from a src/App.js file:
+
+    - go to https://www.robinwieruch.de/react-testing-library/ and scroll down 
+                 
+    - Scroll down to: "React Testing Library: Rendering a Component"
+
+
+    STEP1. Let's read up about React Function Components
+          https://www.robinwieruch.de/react-function-component/
+
+          React Function Components -- also known as React Functional Components --
+       are the status quo of writing modern React applications. In the past, 
+       there have been various React Component Types, but with the introduction
+       of React Hooks it's possible to write your entire application with just 
+       functions as React components. (Do a separate demo project later)
+
+         This in-depth guide shows you everything about React Function Components.
+       Study it well. We will tackle this later in:
+
+         reviewFolder14-this-folder-is-all-about-function-components
+
+    STEP2. After reading up about function components, go back to  
+        - go to https://www.robinwieruch.de/react-testing-library/ 
+         and scroll down to: "React Testing Library: Rendering a Component"
+
+        - create src/App.test.js and the following:
+               import * as React from 'react';
+                  import { render, screen } from '@testing-library/react';
+
+                  import App from './App';
+
+                  describe('App', () => {
+                  it('renders App component', () => {
+                     render(<App />);
+
+                     screen.debug();
+                  });
+                  }); 
+            See comments in App.test.js
+
+         - copy code to App.js. The great thing about it, React Testing Library 
+           doesn't care much about the actual components. Let's take the following 
+           React components which utilize different React features (useState, event handler, props) 
+           and concepts (controlled component):
+
+
+
+    
+ 2. After testing above scroll down a little bit more and click 
+     "Continue Reading: Testing React Components with React Testing Library"
+     This will take you back to "https://www.robinwieruch.de/react-testing-library/"
+  
+  8. Read this link again and go to "Custom React Setup" to setup JEST 
+     and React Testing Library" yourself.  
+        - you can download a React Boilerplate project from 
+          github https://github.com/rwieruch/minimal-react-webpack-babel-setup.
+          This boiler project has already webpack and babel setup. But dont use it.
+          Create your own React project using create-react-app and set it up yourself.
+       
+     STEP1:
+        npx create-react-app manually-setup-react-app
+          
+        Bring up code in VS Studio Code and understand the project files:
+        A good reference in pluralsight in React is:
+           https://app.pluralsight.com/ilx/video-courses/clips/a028fa58-7f10-4613-9d46-0b4885bba5a7          
+    
+ 
+     STEP2: Install important extensions"
+          npm install -g prettier
+          go to VSCode and install "Prettier Code Formatter" and "Prettier Eslint" extensions
+
+     STEP3: React With Babel- https://www.robinwieruch.de/minimal-react-webpack-babel-setup/#react-with-babel
+         npm install --save-dev @babel/preset-react
+        
+
+     STEP4: React with Webpack
+
+     STEP5: Hot Module Replacement

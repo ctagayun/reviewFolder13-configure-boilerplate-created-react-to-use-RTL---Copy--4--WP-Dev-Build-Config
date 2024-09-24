@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <div>
+      <h1><%= htmlWebpackPlugin.options.title %></h1>
+
+      <div id="app">
+    </div>
+  </body>
+</html>
+
+<!-- 
+Note that you don't need to specify the script tag with the bundle.js file anymore, 
+because Webpack will introduce it automatically for you. Also note that you don't 
+need necessarily the id attribute and the div container, but we have used in the 
+previous tutorial to execute some JavaScript on it.
+-->
